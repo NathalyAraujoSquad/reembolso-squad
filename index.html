@@ -448,13 +448,11 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,
 
     // Mescla comprimido para e-mail
     const mergedEmail=await mesclarComAnexos(formBytesEmail);
-    for (let j = 0; j < chunk.length; j++) binary += String.fromCharCode(chunk[j]);
-    const uint8 = new Uint8Array(mergedEmail);
+    // Converte para base64 em chunks para evitar stack overflow
+    const uint8Email = new Uint8Array(mergedEmail);
     let binary = '';
-    const chunkSize = 1024;
-    for (let i = 0; i < uint8.length; i += chunkSize) {
-      const chunk = uint8.subarray(i, Math.min(i + chunkSize, uint8.length));
-      for (let j = 0; j < chunk.length; j++) binary += String.fromCharCode(chunk[j]);
+    for (let i = 0; i < uint8Email.length; i++) {
+      binary += String.fromCharCode(uint8Email[i]);
     }
     const mergedBase64 = btoa(binary);
 
