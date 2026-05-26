@@ -448,7 +448,14 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,
 
     // Mescla comprimido para e-mail
     const mergedEmail=await mesclarComAnexos(formBytesEmail);
-    const mergedBase64=btoa(String.fromCharCode(...new Uint8Array(mergedEmail)));
+    // Converte para base64 em chunks para evitar stack overflow
+    const uint8 = new Uint8Array(mergedEmail);
+    let mergedBase64 = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8.length; i += chunkSize) {
+      mergedBase64 += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+    }
+    mergedBase64 = btoa(mergedBase64);
 
     // Monta tabela HTML para o e-mail
     const tabelaHTML=`
