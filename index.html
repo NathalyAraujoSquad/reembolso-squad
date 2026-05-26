@@ -1,4 +1,3 @@
-
 const DESTINATARIO = 'nathaly.araujo@squadrealty.com.br';
 
 function doPost(e) {
@@ -101,3 +100,4 @@ function doGet() {
   const output = ContentService.createTextOutput(JSON.stringify({status:'online'}));
   output.setMimeType(ContentService.MimeType.JSON);
   return output;
+}
