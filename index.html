@@ -410,17 +410,12 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,
   await new Promise(r=>setTimeout(r,300));
 
   try{
-    const canvas=await html2canvas(tpl,{
-      scale:4,
-      useCORS:false,
-      allowTaint:true,
-      backgroundColor:'#ffffff',
-      logging:false,
-      width:794,
-      windowWidth:794,
-      imageTimeout:0,
+    // Renderiza em alta qualidade para download local
+    const canvasHQ = await html2canvas(tpl, {
+      scale:4, useCORS:false, allowTaint:true,
+      backgroundColor:'#ffffff', logging:false,
+      width:794, windowWidth:794, imageTimeout:0,
       onclone: cloned => {
-        // no clone, força imagens data: como background via canvas nativo
         cloned.querySelectorAll('img').forEach(img=>{
           if(img.src.startsWith('data:')){
             const c=document.createElement('canvas');
@@ -433,31 +428,54 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,
       }
     });
 
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const W=210, H=297;
-    const imgH=(canvas.height*W)/canvas.width;
-
-    if(imgH<=H){
-      doc.addImage(canvas.toDataURL('image/png'),'PNG',0,0,W,imgH);
-    } else {
-      let posY=0, remaining=imgH;
-      while(remaining>0){
-        const sliceH=Math.min(H,remaining);
-        const sliceCanvas=document.createElement('canvas');
-        const ratio=canvas.width/W;
-        sliceCanvas.width=canvas.width;
-        sliceCanvas.height=sliceH*ratio;
-        sliceCanvas.getContext('2d').drawImage(canvas,0,posY*ratio,canvas.width,sliceH*ratio,0,0,canvas.width,sliceH*ratio);
-        if(posY>0) doc.addPage();
-        doc.addImage(sliceCanvas.toDataURL('image/png'),'PNG',0,0,W,sliceH);
-        posY+=sliceH; remaining-=sliceH;
+    // Renderiza em qualidade menor para envio por e-mail (~2x menor)
+    const canvasEmail = await html2canvas(tpl, {
+      scale:2, useCORS:false, allowTaint:true,
+      backgroundColor:'#ffffff', logging:false,
+      width:794, windowWidth:794, imageTimeout:0,
+      onclone: cloned => {
+        cloned.querySelectorAll('img').forEach(img=>{
+          if(img.src.startsWith('data:')){
+            const c=document.createElement('canvas');
+            const i=new Image(); i.src=img.src;
+            c.width=img.naturalWidth||140; c.height=img.naturalHeight||40;
+            c.getContext('2d').drawImage(i,0,0);
+            img.src=c.toDataURL();
+          }
+        });
       }
+    });
+
+    function canvasToPDF(cvs){
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      const W=210, H=297;
+      const imgH=(cvs.height*W)/cvs.width;
+      if(imgH<=H){
+        doc.addImage(cvs.toDataURL('image/jpeg',0.85),'JPEG',0,0,W,imgH);
+      } else {
+        let posY=0, remaining=imgH;
+        while(remaining>0){
+          const sliceH=Math.min(H,remaining);
+          const sc=document.createElement('canvas');
+          const ratio=cvs.width/W;
+          sc.width=cvs.width; sc.height=sliceH*ratio;
+          sc.getContext('2d').drawImage(cvs,0,posY*ratio,cvs.width,sliceH*ratio,0,0,cvs.width,sliceH*ratio);
+          if(posY>0) doc.addPage();
+          doc.addImage(sc.toDataURL('image/jpeg',0.85),'JPEG',0,0,W,sliceH);
+          posY+=sliceH; remaining-=sliceH;
+        }
+      }
+      return doc;
     }
 
-    // Extrai apenas a parte base64 pura (sem o prefixo data:...)
-    const pdfBase64 = doc.output('datauristring').split(',')[1];
-    doc.save('reembolso_'+nome.replace(/\s+/g,'_')+'.pdf');
+    // PDF alta qualidade → download
+    const docHQ = canvasToPDF(canvasHQ);
+    docHQ.save('reembolso_'+nome.replace(/\s+/g,'_')+'.pdf');
+
+    // PDF menor → e-mail
+    const docEmail = canvasToPDF(canvasEmail);
+    const pdfBase64 = docEmail.output('datauristring').split(',')[1];
 
     // Monta tabela HTML para o e-mail
     const tabelaHTML = `
