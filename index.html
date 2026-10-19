@@ -286,7 +286,7 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
   <div style="height:32px"></div>
   <div class="pt-footer-gold"></div>
   <div class="pt-footer">
-    <p><strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84</p>
+    <p id="pt-footer-empresa"><strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84</p>
     <p style="color:#C9A84C;font-size:9px">Rua Fernandes Tourinho, 147 – 13° andar – Savassi – Belo Horizonte/MG</p>
   </div>
 </div>
@@ -296,8 +296,8 @@ const GAS_URL='https://script.google.com/macros/s/AKfycbxcxdI4uodm70dueCiODvfAGZ
 let arquivos=[],totalDesp=0,empresaSelecionada='';
 
 const EMPRESAS = {
-  'SQUAD REALTY':    { cnpj:'32.482.060/0001-84', rodape:'<strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84' },
-  'SQUAD CONNECTIONS':{ cnpj:'47.045.525/0001-07', rodape:'<strong>CONNECTIONS SQUAD LTDA</strong> &nbsp;·&nbsp; CNPJ: 47.045.525/0001-07' },
+  'SQUAD REALTY':     { cnpj:'32.482.060/0001-84', razao:'SQUAD REALTY S.A',       rodape:'<strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84' },
+  'SQUAD CONNECTIONS':{ cnpj:'47.045.525/0001-07', razao:'CONNECTIONS SQUAD LTDA', rodape:'<strong>CONNECTIONS SQUAD LTDA</strong> &nbsp;·&nbsp; CNPJ: 47.045.525/0001-07' },
 };
 
 function selecionarEmpresa(nome, btn){
@@ -314,6 +314,7 @@ function confirmarEmpresa(){
   // Atualiza título e rodapé conforme empresa
   document.getElementById('header-title').textContent='Reembolso de Despesas — '+empresaSelecionada;
   document.getElementById('footer-empresa').innerHTML=EMPRESAS[empresaSelecionada].rodape;
+  document.getElementById('pt-footer-empresa').innerHTML=EMPRESAS[empresaSelecionada].rodape;
 }
 const fmtBRL=n=>'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const parseBRL=v=>parseFloat((v||'').replace(/\./g,'').replace(',','.'))||0;
