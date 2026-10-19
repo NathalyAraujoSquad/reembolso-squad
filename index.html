@@ -11,6 +11,25 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f2f2f0;min-height:100vh}
 .page{max-width:820px;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.10)}
+
+/* TELA DE SELEÇÃO */
+#tela-selecao{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f2f2f0}
+.sel-card{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.12);padding:48px 56px;max-width:560px;width:100%;text-align:center}
+.sel-logo{width:160px;margin:0 auto 28px}
+.sel-divider{height:2px;background:linear-gradient(90deg,#C9A84C,#e8d08a,#C9A84C);margin:0 0 28px}
+.sel-title{font-size:11px;font-weight:700;letter-spacing:3px;color:#888;text-transform:uppercase;margin-bottom:8px}
+.sel-subtitle{font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:32px}
+.sel-options{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sel-btn{border:2px solid #e0e0e0;border-radius:10px;padding:24px 16px;cursor:pointer;background:#fff;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:10px}
+.sel-btn:hover{border-color:#C9A84C;background:#fffdf5;transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+.sel-btn.active{border-color:#C9A84C;background:#fffdf5}
+.sel-btn-icon{width:48px;height:48px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center}
+.sel-btn-icon svg{width:24px;height:24px}
+.sel-btn-name{font-size:13px;font-weight:700;color:#1a1a1a;letter-spacing:1px}
+.sel-btn-sub{font-size:10px;color:#aaa;letter-spacing:.5px}
+.sel-confirm{width:100%;margin-top:24px;padding:14px;background:#1a1a1a;color:#C9A84C;border:none;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:none}
+.sel-confirm:hover{background:#C9A84C;color:#1a1a1a}
+.sel-confirm.visible{display:block}
 .header{padding:28px 36px 20px;border-top:5px solid #1a1a1a;background:#fff}
 .header-top{display:flex;justify-content:space-between;align-items:flex-start}
 .arrow-icon{width:32px;height:32px;opacity:.7;flex-shrink:0}
@@ -123,7 +142,7 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
       </svg>
     </div>
     <div class="header-divider"></div>
-    <div class="header-title">Reembolso de Despesas</div>
+    <div class="header-title" id="header-title">Reembolso de Despesas</div>
   </div>
 
   <div class="form-body">
@@ -163,6 +182,20 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
     </div>
 
     <div class="section">
+      <div class="section-label">Dados Bancários</div>
+      <div class="grid-3" style="margin-bottom:12px">
+        <div><label>Banco *</label><input type="text" id="banco" placeholder="Ex: Itaú, Bradesco..."></div>
+        <div><label>Tipo de Conta *</label><select id="tipo-conta"><option value="">Selecione...</option><option>Conta Corrente</option><option>Conta Poupança</option><option>Conta de Pagamento</option></select></div>
+        <div><label>CPF/CNPJ do Titular *</label><input type="text" id="cpf-banco" placeholder="000.000.000-00"></div>
+      </div>
+      <div class="grid-3">
+        <div><label>Agência *</label><input type="text" id="agencia" placeholder="Ex: 1234"></div>
+        <div><label>Conta *</label><input type="text" id="conta" placeholder="Ex: 12345-6"></div>
+        <div><label>Chave PIX</label><input type="text" id="pix" placeholder="CPF, e-mail, telefone ou chave"></div>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="section-label">Comprovantes e Anexos</div>
       <div class="upload-zone" onclick="document.getElementById('finput').click()">
         <div class="upload-icon">📎</div>
@@ -180,8 +213,8 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
   </div>
 
   <div class="footer-gold"></div>
-  <div class="footer">
-    <p><strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84</p>
+  <div class="footer" id="form-footer">
+    <p id="footer-empresa"><strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84</p>
     <p>Rua Fernandes Tourinho, 147 – 13° andar – Savassi – BH/MG</p>
   </div>
 </div>
@@ -213,6 +246,17 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
       <div><div class="pt-field-lbl">Período</div><div class="pt-field-val" id="pt-periodo">—</div></div>
     </div>
     <div class="pt-full"><div class="pt-field-lbl">Motivo</div><div class="pt-field-val" id="pt-motivo">—</div></div>
+    <div class="pt-sec-label" style="margin-top:12px">Dados Bancários</div>
+    <div class="pt-grid-3" style="margin-bottom:10px">
+      <div><div class="pt-field-lbl">Banco</div><div class="pt-field-val" id="pt-banco">—</div></div>
+      <div><div class="pt-field-lbl">Tipo de Conta</div><div class="pt-field-val" id="pt-tipo-conta">—</div></div>
+      <div><div class="pt-field-lbl">CPF/CNPJ do Titular</div><div class="pt-field-val" id="pt-cpf-banco">—</div></div>
+    </div>
+    <div class="pt-grid-3" style="margin-bottom:12px">
+      <div><div class="pt-field-lbl">Agência</div><div class="pt-field-val" id="pt-agencia">—</div></div>
+      <div><div class="pt-field-lbl">Conta</div><div class="pt-field-val" id="pt-conta">—</div></div>
+      <div><div class="pt-field-lbl">Chave PIX</div><div class="pt-field-val" id="pt-pix">—</div></div>
+    </div>
     <div class="pt-sec-label">Relação das Despesas</div>
     <table class="pt-table">
       <thead><tr><th style="width:110px">Data</th><th>Tipo de Despesa</th><th style="width:120px">Valor</th></tr></thead>
@@ -249,7 +293,28 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
 
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbxcxdI4uodm70dueCiODvfAGZ6cvBOBwcZ9HYLn4da-HeumKrlC3HgJfZcn2DEtpA7T/exec';
-let arquivos=[],totalDesp=0;
+let arquivos=[],totalDesp=0,empresaSelecionada='';
+
+const EMPRESAS = {
+  'SQUAD REALTY':    { cnpj:'32.482.060/0001-84', rodape:'<strong>SQUAD REALTY S.A</strong> &nbsp;·&nbsp; CNPJ: 32.482.060/0001-84' },
+  'SQUAD CONNECTIONS':{ cnpj:'47.045.525/0001-07', rodape:'<strong>CONNECTIONS SQUAD LTDA</strong> &nbsp;·&nbsp; CNPJ: 47.045.525/0001-07' },
+};
+
+function selecionarEmpresa(nome, btn){
+  document.querySelectorAll('.sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  empresaSelecionada=nome;
+  document.getElementById('btn-confirmar').classList.add('visible');
+}
+
+function confirmarEmpresa(){
+  if(!empresaSelecionada) return;
+  document.getElementById('tela-selecao').style.display='none';
+  document.getElementById('tela-formulario').style.display='block';
+  // Atualiza título e rodapé conforme empresa
+  document.getElementById('header-title').textContent='Reembolso de Despesas — '+empresaSelecionada;
+  document.getElementById('footer-empresa').innerHTML=EMPRESAS[empresaSelecionada].rodape;
+}
 const fmtBRL=n=>'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const parseBRL=v=>parseFloat((v||'').replace(/\./g,'').replace(',','.'))||0;
 
@@ -321,13 +386,19 @@ function showMsg(t,tp){
   const m=document.getElementById('msg');m.textContent=t;m.className='msg '+tp;m.style.display='block';
   setTimeout(()=>m.style.display='none',6000);
 }
-function preencherTemplate(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,totR){
+function preencherTemplate(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,cpfBanco,agencia,conta,pix,linhas,adiant,totD,totR){
   document.getElementById('pt-nome').textContent=nome;
   document.getElementById('pt-cpf').textContent=cpf;
   document.getElementById('pt-aprov').textContent=aprov;
   document.getElementById('pt-centro').textContent=centro;
   document.getElementById('pt-periodo').textContent=periodo;
   document.getElementById('pt-motivo').textContent=motivo;
+  document.getElementById('pt-banco').textContent=banco;
+  document.getElementById('pt-tipo-conta').textContent=tipoConta;
+  document.getElementById('pt-cpf-banco').textContent=cpfBanco;
+  document.getElementById('pt-agencia').textContent=agencia;
+  document.getElementById('pt-conta').textContent=conta;
+  document.getElementById('pt-pix').textContent=pix||'—';
   const tb=document.getElementById('pt-tbody');tb.innerHTML='';
   linhas.forEach(l=>{
     const tr=document.createElement('tr');
@@ -430,10 +501,10 @@ async function mesclarComAnexos(formBytes){
   return await merged.save();
 }
 
-async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,totR){
+async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,cpfBanco,agencia,conta,pix,linhas,adiant,totD,totR){
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;btn.textContent='Gerando PDF...';
-  preencherTemplate(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,totR);
+  preencherTemplate(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,cpfBanco,agencia,conta,pix,linhas,adiant,totD,totR);
   try{
     // Renderiza em duas qualidades
     const canvasHQ=await renderCanvas(4);
@@ -483,6 +554,7 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,
       :'Nenhum comprovante anexado.';
 
     const payload={
+      empresa:       empresaSelecionada,
       nome,cpf,
       aprovador:aprov,
       centro_custos:centro,
@@ -518,6 +590,13 @@ function concluir(){
   const periodo=document.getElementById('periodo').value.trim();
   const motivo=document.getElementById('motivo').value.trim();
   if(!nome||!cpf||!aprov||!centro||!periodo||!motivo){showMsg('Preencha todos os campos obrigatórios (*).','err');return;}
+  const banco=document.getElementById('banco').value.trim();
+  const tipoConta=document.getElementById('tipo-conta').value.trim();
+  const cpfBanco=document.getElementById('cpf-banco').value.trim();
+  const agencia=document.getElementById('agencia').value.trim();
+  const conta=document.getElementById('conta').value.trim();
+  const pix=document.getElementById('pix').value.trim();
+  if(!banco||!tipoConta||!cpfBanco||!agencia||!conta){showMsg('Preencha todos os dados bancários obrigatórios (*).','err');return;}
   const linhas=[];
   document.querySelectorAll('#tbody tr').forEach(tr=>{
     const d=tr.querySelector('.dinput').value.trim();
@@ -529,7 +608,7 @@ function concluir(){
   const adiant=parseBRL(document.getElementById('adiant').value);
   const totD=linhas.reduce((s,l)=>s+l.valor,0);
   const totR=Math.max(0,totD-adiant);
-  gerarPDF(nome,cpf,aprov,centro,periodo,motivo,linhas,adiant,totD,totR);
+  gerarPDF(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,cpfBanco,agencia,conta,pix,linhas,adiant,totD,totR);
 }
 
 addLinha();addLinha();addLinha();
