@@ -456,7 +456,21 @@ function preencherTemplate(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,
   }
 }
 
-async function renderCanvas(scale){
+// Converte imagem para base64 para uso no html2canvas
+function imgParaBase64(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(url); // fallback
+    img.src = url + '?v=' + Date.now();
+  });
+}
   const tpl=document.getElementById('pdf-template');
   tpl.style.left='-9999px';tpl.style.visibility='visible';
   const imgs=tpl.querySelectorAll('img');
@@ -649,6 +663,9 @@ function concluir(){
 }
 
 addLinha();addLinha();addLinha();
+
+// Garante que a logo padrão carrega
+document.getElementById('logo-realty').src='logo Squad.png';
 </script>
 </body>
 </html>
