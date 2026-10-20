@@ -150,6 +150,20 @@ input:focus,select:focus{outline:none;border-color:#C9A84C;background:#fffdf5;bo
 
   <div class="form-body">
     <div class="section">
+      <div class="section-label">Empresa</div>
+      <div class="grid-2">
+        <div>
+          <label>Selecione a Empresa *</label>
+          <select id="empresa" onchange="atualizarEmpresa()">
+            <option value="">Selecione...</option>
+            <option value="SQUAD REALTY">Squad Realty S.A — CNPJ: 32.482.060/0001-84</option>
+            <option value="SQUAD CONNECTIONS">Connections Squad Ltda — CNPJ: 47.045.525/0001-07</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="section-label">Dados do Solicitante</div>
       <div class="grid-2" style="margin-bottom:12px">
         <div><label>Nome Completo *</label><input type="text" id="nome" placeholder="Nome do solicitante"></div>
@@ -303,21 +317,12 @@ const EMPRESAS = {
   'SQUAD CONNECTIONS':{ cnpj:'47.045.525/0001-07', razao:'CONNECTIONS SQUAD LTDA', rodape:'<strong>CONNECTIONS SQUAD LTDA</strong> &nbsp;·&nbsp; CNPJ: 47.045.525/0001-07' },
 };
 
-function selecionarEmpresa(nome, btn){
-  document.querySelectorAll('.sel-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  empresaSelecionada=nome;
-  document.getElementById('btn-confirmar').classList.add('visible');
-}
-
-function confirmarEmpresa(){
-  if(!empresaSelecionada) return;
-  document.getElementById('tela-selecao').style.display='none';
-  document.getElementById('tela-formulario').style.display='block';
-  // Atualiza título e rodapé conforme empresa
-  document.getElementById('header-title').textContent='Reembolso de Despesas — '+empresaSelecionada;
-  document.getElementById('footer-empresa').innerHTML=EMPRESAS[empresaSelecionada].rodape;
-  document.getElementById('pt-footer-empresa').innerHTML=EMPRESAS[empresaSelecionada].rodape;
+function atualizarEmpresa(){
+  const emp = document.getElementById('empresa').value;
+  if(!emp) return;
+  document.getElementById('footer-empresa').innerHTML = EMPRESAS[emp].rodape;
+  document.getElementById('pt-footer-empresa').innerHTML = EMPRESAS[emp].rodape;
+  document.getElementById('header-title').textContent = 'Reembolso de Despesas — ' + emp;
 }
 const fmtBRL=n=>'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const parseBRL=v=>parseFloat((v||'').replace(/\./g,'').replace(',','.'))||0;
@@ -558,7 +563,7 @@ async function gerarPDF(nome,cpf,aprov,centro,periodo,motivo,banco,tipoConta,cpf
       :'Nenhum comprovante anexado.';
 
     const payload={
-      empresa:       empresaSelecionada,
+      empresa,
       nome,cpf,
       aprovador:aprov,
       centro_custos:centro,
@@ -593,7 +598,9 @@ function concluir(){
   const centro=document.getElementById('centro').value.trim();
   const periodo=document.getElementById('periodo').value.trim();
   const motivo=document.getElementById('motivo').value.trim();
+  const empresa = document.getElementById('empresa').value.trim();
   if(!nome||!cpf||!aprov||!centro||!periodo||!motivo){showMsg('Preencha todos os campos obrigatórios (*).','err');return;}
+  if(!empresa){showMsg('Selecione a empresa.','err');return;}
   const banco=document.getElementById('banco').value.trim();
   const tipoConta=document.getElementById('tipo-conta').value.trim();
   const cpfBanco=document.getElementById('cpf-banco').value.trim();
